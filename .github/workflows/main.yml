@@ -1,0 +1,41 @@
+name: Build APK
+
+on:
+  push:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Arrange files into the Android project layout
+        run: |
+          mkdir -p app/src/main/java/com/smartnet/speedtest app/src/main/res/xml
+          mv build_gradle.kts build.gradle.kts
+          mv settings_gradle.kts settings.gradle.kts
+          mv app-build_gradle.kts app/build.gradle.kts
+          mv AndroidManifest.xml app/src/main/AndroidManifest.xml
+          mv file_paths.xml app/src/main/res/xml/file_paths.xml
+          mv *.kt app/src/main/java/com/smartnet/speedtest/
+          find . -path ./.git -prune -o -type f -print | sort
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Build debug APK
+        run: gradle assembleDebug --no-daemon
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: SustainedSpeedTest-debug-apk
+          path: app/build/outputs/apk/debug/*.apk
