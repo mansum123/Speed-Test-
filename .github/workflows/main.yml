@@ -19,14 +19,14 @@ jobs:
           mv AndroidManifest.xml app/src/main/AndroidManifest.xml
           mv file_paths.xml app/src/main/res/xml/file_paths.xml
           mv *.kt app/src/main/java/com/smartnet/speedtest/
-          find . -path ./.git -prune -o -type f -print | sort
 
       - uses: actions/setup-java@v4
         with:
           distribution: temurin
           java-version: '17'
 
-      - uses: android-actions/setup-android@v3
+      - name: Accept Android SDK licenses
+        run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null || true
 
       - uses: gradle/actions/setup-gradle@v4
         with:
